@@ -33,6 +33,11 @@
 using namespace std;
 using namespace bagel;
 
+enum PROGRAM_EXIT {
+    PROGRAM_EXIT_SUCCESS   = 0,
+    PROGRAM_EXIT_EXCEPTION = 1
+};
+
 int main(int argc, char** argv) {
   try {
     if (argc == 2) {
@@ -41,13 +46,18 @@ int main(int argc, char** argv) {
     } else if (argc == 3 && string(argv[1]) == "-i") {
       const string input = argv[2];
       run_bagel_from_json(input);
+    } else if (argc == 1) {
+      cout << "ERROR: no input file provided" << endl;
+      return PROGRAM_EXIT_EXCEPTION;
     } else {
-      throw runtime_error("no input file provided");
+      cout << "ERROR: Unexpected command line arguments" << endl;
+      return PROGRAM_EXIT_EXCEPTION;
     }
   } catch (const Termination& e) {
     cout << "  -- Termination requested --" << endl;
     cout << "  message: " << e.what() << endl;
     print_footer();
+    return PROGRAM_EXIT_EXCEPTION;
   } catch (const exception& e) {
     if (resources__)
       resources__->proc()->cout_on();
@@ -57,10 +67,9 @@ int main(int argc, char** argv) {
       cout << "  ERROR: EXCEPTION RAISED:  " << e.what() << endl;
     if (resources__)
       resources__->proc()->cout_off();
+    return PROGRAM_EXIT_EXCEPTION;
   } catch (...) {
     throw;
   }
-  return 0;
+  return PROGRAM_EXIT_SUCCESS;
 }
-
-
